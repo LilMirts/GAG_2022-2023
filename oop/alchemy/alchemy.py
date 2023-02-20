@@ -93,8 +93,9 @@ class AlchemicalStorage:
 
         :return: Content as a string.
         """
+        sorted_elements = sorted(self.elements, key=lambda x: x.name)
         content_dict = {}
-        for e in self.elements:
+        for e in sorted_elements:
             if e.name in content_dict:
                 content_dict[e.name] += 1
             else:
