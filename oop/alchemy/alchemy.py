@@ -10,6 +10,9 @@ class AlchemicalElement:
     def __init__(self, name: str):
         self.name = name
 
+    def __repr__(self):
+        return f"<AE: {self.name}>"
+
 
 class AlchemicalStorage:
     """AlchemicalStorage class."""
