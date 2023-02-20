@@ -33,8 +33,12 @@ class AlchemicalStorage:
 
         :param element: Input object to add to storage.
         """
+        if isinstance(element, AlchemicalElement):
+            self.elements.append(element)
+        else:
+            raise TypeError
 
-    def pop(self, element_name: str) -> AlchemicalElement | None:
+    def pop(self, element_name: str) -> AlchemicalElement:
         """
         Remove and return previously added element from storage by its name.
 
@@ -44,9 +48,12 @@ class AlchemicalStorage:
         :param element_name: Name of the element to remove.
         :return: The removed AlchemicalElement object or None.
         """
+        for i, e in enumerate(self.elements[::-1]):
+            if e.name == element_name:
+                return self.elements.pop(-1 - i)
         return None
 
-    def extract(self) -> list[AlchemicalElement]:
+    def extract(self):
         """
         Return a list of all of the elements from storage and empty the storage itself.
 
@@ -63,7 +70,9 @@ class AlchemicalStorage:
 
         :return: A list of all of the elements that were previously in the storage.
         """
-        return []
+        elements = self.elements.copy()
+        self.elements = []
+        return elements
 
     def get_content(self) -> str:
         """
@@ -84,7 +93,18 @@ class AlchemicalStorage:
 
         :return: Content as a string.
         """
-        return ''
+        content_dict = {}
+        for e in self.elements:
+            if e.name in content_dict:
+                content_dict[e.name] += 1
+            else:
+                content_dict[e.name] = 1
+        content_str = "Content:\n"
+        if not content_dict:
+            return content_str + " Empty."
+        for e_name in content_dict:
+            content_str += f" *{e_name} x {content_dict[e_name]}\n"
+        return content_str
 
 
 if __name__ == '__main__':
