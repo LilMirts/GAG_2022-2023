@@ -23,6 +23,7 @@ class AlchemicalStorage:
 
         You will likely need to add something here, maybe a list?
         """
+        self.elements = []
 
     def add(self, element: AlchemicalElement):
         """
