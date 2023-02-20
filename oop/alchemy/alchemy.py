@@ -1,5 +1,6 @@
 """Alchemy."""
 
+
 class AlchemicalElement:
     """
     AlchemicalElement class.
@@ -8,9 +9,11 @@ class AlchemicalElement:
     """
 
     def __init__(self, name: str):
+        """Initialize the AlchemicalElement class."""
         self.name = name
 
     def __repr__(self):
+        """Represent the AlchemicalElement object."""
         return f"<AE: {self.name}>"
 
 
