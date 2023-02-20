@@ -103,7 +103,7 @@ class AlchemicalStorage:
         if not content_dict:
             return content_str + "\n Empty."
         for e_name in content_dict:
-            content_str += f"\n *{e_name} x {content_dict[e_name]}"
+            content_str += f"\n * {e_name} x {content_dict[e_name]}"
         return content_str
 
 
