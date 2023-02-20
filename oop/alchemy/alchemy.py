@@ -99,11 +99,11 @@ class AlchemicalStorage:
                 content_dict[e.name] += 1
             else:
                 content_dict[e.name] = 1
-        content_str = "Content:\n"
+        content_str = "Content:"
         if not content_dict:
-            return content_str + " Empty."
+            return content_str + "\n Empty."
         for e_name in content_dict:
-            content_str += f" *{e_name} x {content_dict[e_name]}\n"
+            content_str += f"\n *{e_name} x {content_dict[e_name]}"
         return content_str
 
 
