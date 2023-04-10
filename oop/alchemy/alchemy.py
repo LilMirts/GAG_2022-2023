@@ -189,6 +189,8 @@ class Cauldron(AlchemicalStorage):
 
     def __init__(self, recipes: AlchemicalRecipes):
         """Initialize the Cauldron class."""
+        super().__init__()
+        self.recipes = recipes
 
     def add(self, element: AlchemicalElement):
         """
@@ -206,6 +208,8 @@ class Cauldron(AlchemicalStorage):
 
         :param element: Input object to add to storage.
         """
+        for storage_element in self.elements:
+            product = self.recipes.get_product_name(element, storage_element)
 
 
 if __name__ == '__main__':
