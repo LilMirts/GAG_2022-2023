@@ -221,6 +221,7 @@ class Cauldron(AlchemicalStorage):
                     if element.uses == 0:
                         continue
                     element.uses -= 1
+                    self.elements.append(element)
                 if isinstance(storage_element, Catalyst):
                     if storage_element.uses == 0:
                         continue
