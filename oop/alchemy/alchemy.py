@@ -136,7 +136,7 @@ class AlchemicalRecipes:
         """
         if len({first_component_name, second_component_name, product_name}) < 3:
             raise DuplicateRecipeNamesException
-        components = (first_component_name, second_component_name)
+        components = {first_component_name, second_component_name}
         recipe = [components, product_name]
         if recipe in self.recipes:
             raise RecipeOverlapException
@@ -163,7 +163,7 @@ class AlchemicalRecipes:
         :param second_component_name: The name of the second component element.
         :return: The name of the product element or None.
         """
-        components = (first_component_name, second_component_name)
+        components = {first_component_name, second_component_name}
         for recipe in self.recipes:
             if recipe[0] == components:
                 return recipe[1]
@@ -172,7 +172,7 @@ class AlchemicalRecipes:
         """Return the tuple of the names of two components that make the product."""
         for recipe in self.recipes:
             if recipe[1] == product_name:
-                return recipe[0]
+                return tuple(recipe[0])
 
 
 class DuplicateRecipeNamesException(Exception):
