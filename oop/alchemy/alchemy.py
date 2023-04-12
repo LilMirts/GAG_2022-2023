@@ -136,7 +136,7 @@ class AlchemicalRecipes:
         """
         if len({first_component_name, second_component_name, product_name}) < 3:
             raise DuplicateRecipeNamesException
-        components = {first_component_name, second_component_name}
+        components = (first_component_name, second_component_name)
         recipe = [components, product_name]
         if recipe in self.recipes:
             raise RecipeOverlapException
@@ -163,11 +163,16 @@ class AlchemicalRecipes:
         :param second_component_name: The name of the second component element.
         :return: The name of the product element or None.
         """
-        components = {first_component_name, second_component_name}
+        components = (first_component_name, second_component_name)
         for recipe in self.recipes:
             if recipe[0] == components:
                 return recipe[1]
-        return None
+
+    def get_component_names(self, product_name: str) -> tuple[str, str]:
+        """Return the tuple of the names of two components that make the product."""
+        for recipe in self.recipes:
+            if recipe[1] == product_name:
+                return recipe[0]
 
 
 class DuplicateRecipeNamesException(Exception):
@@ -212,47 +217,80 @@ class Cauldron(AlchemicalStorage):
         for storage_element in self.elements[::-1]:
             product_name = self.recipes.get_product_name(element.name, storage_element.name)
             if product_name:
-                self.pop(storage_element.name)
+                if isinstance(element, Catalyst):
+                    if element.uses == 0:
+                        continue
+                    element.uses -= 1
+                if isinstance(storage_element, Catalyst):
+                    if storage_element.uses == 0:
+                        continue
+                    storage_element.uses -= 1
+                if not isinstance(element, Catalyst) and not isinstance(storage_element, Catalyst):
+                    self.pop(storage_element.name)
                 product = AlchemicalElement(product_name)
                 self.elements.append(product)
                 return
         self.elements.append(element)
 
 
-if __name__ == '__main__':
-    recipes = AlchemicalRecipes()
-    recipes.add_recipe('Fire', 'Water', 'Steam')
-    recipes.add_recipe('Fire', 'Earth', 'Iron')
-    recipes.add_recipe('Water', 'Iron', 'Rust')
+class Purifier(AlchemicalStorage):
+    """
+    Purifier class.
 
-    print(recipes.get_product_name('Water', 'Fire'))  # -> 'Steam'
+    Extends the 'AlchemicalStorage' class.
+    """
 
-    try:
-        recipes.add_recipe('Fire', 'Something else', 'Fire')
-        print('Did not raise, not working as intended.')
+    def __init__(self, recipes: AlchemicalRecipes):
+        """Initialize the Purifier class."""
+        super().__init__()
+        self.recipes = recipes
 
-    except DuplicateRecipeNamesException:
-        print('Raised DuplicateRecipeNamesException, working as intended!')
+    def add(self, element: AlchemicalElement):
+        """
+        Add element to storage and check if it can be split into anything.
 
-    try:
-        recipes.add_recipe('Fire', 'Earth', 'Gold')
-        print('Did not raise, not working as intended.')
+        Use the 'recipes' object that was given in the constructor to determine the combinations.
 
-    except RecipeOverlapException:
-        print('Raised RecipeOverlapException, working as intended!')
+        Example:
+            recipes = AlchemicalRecipes()
+            recipes.add_recipe('Water', 'Wind', 'Ice')
+            purifier = Purifier(recipes)
+            purifier.add(AlchemicalElement('Ice'))
+            purifier.extract() # -> [<AE: Water>, <AE: Wind>]   or  [<AE: Wind>, <AE: Water>]
 
-    cauldron = Cauldron(recipes)
-    cauldron.add(AlchemicalElement('Earth'))
-    cauldron.add(AlchemicalElement('Water'))
-    cauldron.add(AlchemicalElement('Fire'))
+        :param element: Input object to add to storage.
+        """
+        if not isinstance(element, AlchemicalElement):
+            raise TypeError
 
-    print(cauldron.extract())  # -> [<AE: Earth>, <AE: Steam>]
+        components = self.recipes.get_component_names(element.name)
+        if components:
+            self.elements.extend([AlchemicalElement(components[0]), AlchemicalElement(components[1])])
+        else:
+            self.elements.append(element)
 
-    cauldron.add(AlchemicalElement('Earth'))
-    cauldron.add(AlchemicalElement('Earth'))
-    cauldron.add(AlchemicalElement('Earth'))
-    cauldron.add(AlchemicalElement('Fire'))
-    cauldron.add(AlchemicalElement('Fire'))
-    cauldron.add(AlchemicalElement('Water'))
 
-    print(cauldron.extract())  # -> [<AE: Earth>, <AE: Iron>, <AE: Rust>]
+class Catalyst(AlchemicalElement):
+    """Catalyst class."""
+
+    def __init__(self, name: str, uses: int):
+        """
+        Initialize the Catalyst class.
+
+        :param name: The name of the Catalyst.
+        :param uses: The number of uses the Catalyst has.
+        """
+        super().__init__(name)
+        self.uses = uses
+
+    def __repr__(self) -> str:
+        """
+        Representation of the Catalyst class.
+
+        Example:
+            catalyst = Catalyst("Philosophers' stone", 3)
+            print(catalyst) # -> <C: Philosophers' stone (3)>
+
+        :return: String representation of the Catalyst.
+        """
+        return f"<C: {self.name} ({self.uses})>"
