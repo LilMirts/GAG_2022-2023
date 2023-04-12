@@ -221,7 +221,7 @@ class Cauldron(AlchemicalStorage):
                     if element.uses == 0:
                         continue
                     element.uses -= 1
-                    self.elements.append(element)
+                    self.add(element)
                 if isinstance(storage_element, Catalyst):
                     if storage_element.uses == 0:
                         continue
@@ -229,7 +229,7 @@ class Cauldron(AlchemicalStorage):
                 if not isinstance(element, Catalyst) and not isinstance(storage_element, Catalyst):
                     self.pop(storage_element.name)
                 product = AlchemicalElement(product_name)
-                self.elements.append(product)
+                self.add(product)
                 return
         self.elements.append(element)
 
@@ -266,7 +266,8 @@ class Purifier(AlchemicalStorage):
 
         components = self.recipes.get_component_names(element.name)
         if components:
-            self.elements.extend([AlchemicalElement(components[0]), AlchemicalElement(components[1])])
+            self.add(AlchemicalElement(components[0]))
+            self.add(AlchemicalElement(components[1]))
         else:
             self.elements.append(element)
 
