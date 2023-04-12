@@ -136,15 +136,13 @@ class AlchemicalRecipes:
         """
         if len({first_component_name, second_component_name, product_name}) < 3:
             raise DuplicateRecipeNamesException
-            return
         components = {first_component_name, second_component_name}
         recipe = [components, product_name]
         if recipe in self.recipes:
             raise RecipeOverlapException
-            return
         self.recipes.append(recipe)
 
-    def get_product_name(self, first_component_name: str, second_component_name: str) -> str | None:
+    def get_product_name(self, first_component_name: str, second_component_name: str) -> str:
         """
         Return the name of the product for the two components.
 
@@ -208,8 +206,17 @@ class Cauldron(AlchemicalStorage):
 
         :param element: Input object to add to storage.
         """
-        for storage_element in self.elements:
-            product = self.recipes.get_product_name(element, storage_element)
+        if not isinstance(element, AlchemicalElement):
+            raise TypeError
+
+        for storage_element in self.elements[::-1]:
+            product_name = self.recipes.get_product_name(element.name, storage_element.name)
+            if product_name:
+                self.pop(storage_element.name)
+                product = AlchemicalElement(product_name)
+                self.elements.append(product)
+                return
+        self.elements.append(element)
 
 
 if __name__ == '__main__':
