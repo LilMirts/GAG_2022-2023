@@ -49,6 +49,8 @@ class Item:
         return self.name
 
     def buy(self, qty):
+        if qty > self.stock_qty:
+            raise NotEnoughItemsInStockException
         self.stock_qty -= qty
 
 
@@ -64,11 +66,14 @@ class ShoppingCart:
         return total
 
     def add_items(self, item, qty):
-        if item.stock_qty < qty:
-            raise NotEnoughItemsInStockException
-        else:
-            if item in self.items:
+        if item in self.items:
+            if item.stock_qty - self.items[item] < qty:
+                raise NotEnoughItemsInStockException
+            else:
                 self.items[item] += qty
+        else:
+            if item.stock_qty < qty:
+                raise NotEnoughItemsInStockException
             else:
                 self.items[item] = qty
 

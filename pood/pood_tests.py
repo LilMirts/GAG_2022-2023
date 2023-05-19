@@ -8,6 +8,8 @@ def test_add_to_stock():
     store.add_to_stock("milk", 3.53, 5)
     assert len(store.stock) == 1
     assert store.stock[0].name == "milk"
+    store.add_to_stock("cheese", 2.34, 10)
+    assert store.stock[1].stock_qty == 10
     store.add_to_stock("milk", 3.53, 2)
     assert store.stock[0].stock_qty == 7
     with pytest.raises(SameNameDifferentPriceException):
@@ -20,3 +22,15 @@ def test_register_client():
     assert store.clients[0].is_gold_client is False
     with pytest.raises(ClientIdAlreadyTakenException):
         store.register_client(32, 132.22)
+
+
+def test_add_to_cart():
+    client = store.clients[0]
+    client.cart.add_items(store.stock[0], 3)
+    assert client.cart.items[store.stock[0]] == 3
+    with pytest.raises(NotEnoughItemsInStockException):
+        client.cart.add_items(store.stock[0], 6)
+    with pytest.raises(NotEnoughItemsInStockException):
+        client.cart.add_items(store.stock[1], 11)
+    client.cart.add_items(store.stock[1], 10)
+    assert len(client.cart.items) == 2
