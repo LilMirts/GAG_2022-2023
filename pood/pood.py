@@ -12,12 +12,13 @@ class Client:
         self.history = {}
 
     def checkout(self):
-        total_cost = self.cart.get_total_cost
+        total_cost = self.cart.get_total_cost()
         if self.is_gold_client:
-            total_cost = total_cost * 0.9
+            total_cost = round(total_cost * 0.9, 2)
 
         if total_cost > self.balance:
             raise NotEnoughMoneyException()
+        self.balance = round(self.balance - total_cost, 2)
 
         for item in self.cart.items:
             item.buy(self.cart.items[item])
@@ -32,6 +33,7 @@ class Client:
             for item in items:
                 history_str += f"  {item} x{items[item]}\n"
             history_str += "\n"
+        return history_str[:-2]
 
 
 class NotEnoughMoneyException(Exception):
