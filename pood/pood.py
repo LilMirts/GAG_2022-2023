@@ -104,9 +104,19 @@ class Store:
         self.clients = []
 
     def register_client(self, id, balance, is_gold_client=False):
+        for client in self.clients:
+            if client.id == id:
+                raise ClientIdAlreadyTakenException()
         self.clients.append(Client(id, balance, is_gold_client))
 
     def add_to_stock(self, name, price, qty):
+        for item in self.stock:
+            if item.name == name:
+                if item.price == price:
+                    item.stock_qty += qty
+                    return
+                else:
+                    raise SameNameDifferentPriceException()
         self.stock.append(Item(name, price, qty))
 
     def get_history(self):
@@ -114,3 +124,11 @@ class Store:
         for client in self.clients:
             history.update(client.history)
         return history
+
+
+class SameNameDifferentPriceException(Exception):
+    pass
+
+
+class ClientIdAlreadyTakenException(Exception):
+    pass
